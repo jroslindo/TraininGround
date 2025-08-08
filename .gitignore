@@ -1,0 +1,20 @@
+# Unreal Engine
+Coliseu/Binaries/
+Coliseu/DerivedDataCache/
+Coliseu/Intermediate/
+Coliseu/Saved/
+
+# Plugin build outputs
+Coliseu/Plugins/**/Binaries/
+Coliseu/Plugins/**/Intermediate/
+
+# IDE cruft
+Coliseu/.vs/
+Coliseu/.vscode/
+Coliseu/*.sln
+Coliseu/*.VC.db
+Coliseu/*.VC.opendb
+
+# OS
+Coliseu/.DS_Store
+Coliseu/Thumbs.db
