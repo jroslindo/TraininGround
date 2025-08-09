@@ -4,11 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "InputActionValue.h"
 #include "Bird.generated.h"
+
 
 //forwarding session
 class UCapsuleComponent;
 class USkeletalMeshComponent;
+class UInputMappingContext;
+class UInputAction;
+class USpringArmComponent;
+class UCameraComponent;
+
 
 UCLASS()
 class COLISEU_API ABird : public APawn
@@ -22,7 +29,14 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void MoveForward(float Value);
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input) UInputMappingContext* BirdMappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input) UInputAction* MoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input) UInputAction* LookAction;
+
+	
 
 public:	
 	// Called every frame
@@ -32,9 +46,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	UCapsuleComponent* Capsule;
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* BirdMesh;
+	UPROPERTY(VisibleAnywhere) UCapsuleComponent* Capsule;
+	UPROPERTY(VisibleAnywhere) USkeletalMeshComponent* BirdMesh;
+	UPROPERTY(VisibleAnywhere) USpringArmComponent* SpringArm;
+	UPROPERTY(VisibleAnywhere) UCameraComponent* ViewCamera;
+
 
 };
