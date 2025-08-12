@@ -41,7 +41,7 @@ ABird::ABird()
 
 
 	//Make our target of the controller the bird
-	this->AutoPossessPlayer = EAutoReceiveInput::Player0;
+	//this->AutoPossessPlayer = EAutoReceiveInput::Player1;
 }
 
 // Called when the game starts or when spawned
