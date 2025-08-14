@@ -11,6 +11,7 @@ class UInputMappingContext;
 class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
+class UGroomComponent;
 
 UCLASS()
 class COLISEU_API ASlashCharacter : public ACharacter
@@ -32,6 +33,10 @@ protected:
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpAction;
+	UPROPERTY(EditAnywhere, Category = "Hair")
+	UGroomComponent* Hair;
+	UPROPERTY(EditAnywhere, Category = "Hair")
+	UGroomComponent* Eyebrows;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

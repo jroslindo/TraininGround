@@ -11,6 +11,8 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GroomComponent.h"
 
 
 // Sets default values
@@ -18,6 +20,9 @@ ASlashCharacter::ASlashCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	this->GetCharacterMovement()->bOrientRotationToMovement = true;
+	this->GetCharacterMovement()->RotationRate = FRotator(0,360,0);
 
 	//SpringArm
 	this->SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -32,6 +37,15 @@ ASlashCharacter::ASlashCharacter()
 
 	//Make our target of the controller the bird
 	this->AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	this->Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
+	this->Hair->SetupAttachment(this->GetMesh());
+	this->Hair->AttachmentName = FString("head");
+
+
+	this->Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
+	this->Eyebrows->SetupAttachment(this->GetMesh());
+	this->Eyebrows->AttachmentName = FString("head");
 
 }
 
@@ -53,8 +67,14 @@ void ASlashCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
-	this->AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-	this->AddMovementInput(GetActorRightVector(), MovementVector.X);
+	const FRotator ControlRotation = this->GetControlRotation();
+	const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	this->AddMovementInput(ForwardDirection, MovementVector.Y);
+	this->AddMovementInput(RightDirection, MovementVector.X);
 }
 
 void ASlashCharacter::Look(const FInputActionValue& Value)
