@@ -4,6 +4,7 @@
 #include "Item/Item.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AItem::AItem()
@@ -12,16 +13,29 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	
-
+	//Mesh (3D) of the Bird
+	this->ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
+	this->ItemMesh->SetupAttachment(this->GetRootComponent());
 	
 
+}
+
+void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	const FString OtherActorName = OtherActor->GetName();
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, OtherActorName);
+	}
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GEngine != nullptr)
+
+	this->ItemMesh->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
+	/*if (GEngine != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Blue, FString("Hello Unreal 5.7!!!"));
 		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Blue, this->inputParameter);
@@ -42,7 +56,7 @@ void AItem::BeginPlay()
 	else
 	{
 		DrawDebugSphere(GetWorld(), GetActorLocation(), 50, 24, FColor::Blue, true);
-	}
+	}*/
 }
 
 void AItem::test_funct(float DeltaTime) {
@@ -75,6 +89,11 @@ void AItem::test_funct(float DeltaTime) {
 	
 }
 
+float AItem::TransformedSin()
+{
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
+}
+
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
@@ -85,7 +104,9 @@ void AItem::Tick(float DeltaTime)
 	//	FString message = FString::Printf(TEXT("Delta: %.3f"), DeltaTime);
 	//	GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Green, message);
 	//}
-	this->test_funct(DeltaTime);
+	//this->test_funct(DeltaTime);
+	RunningTime += DeltaTime;
+	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
 
 }
 

@@ -23,6 +23,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString inputParameter = "Nothing";
 
+	//Collisions
+	UFUNCTION()
+	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent, 
+						AActor* OtherActor,
+						UPrimitiveComponent* OtherComp,
+						int32 OtherBodyIndex,
+						bool bFromSweep,
+						const FHitResult& SweepResult
+	);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,5 +42,11 @@ protected:
 
 private:
 	AItem* Objective;
+	UPROPERTY(VisibleAnywhere) class UStaticMeshComponent* ItemMesh;
+
+	float TransformedSin();
+	float RunningTime;
+	float TimeConstant = 2.5f;
+	float Amplitude = 1.f;
 
 };
