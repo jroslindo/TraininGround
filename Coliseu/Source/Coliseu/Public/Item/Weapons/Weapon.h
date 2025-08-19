@@ -6,9 +6,7 @@
 #include "Item/Item.h"
 #include "Weapon.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class COLISEU_API AWeapon : public AItem
 {

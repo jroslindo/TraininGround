@@ -40,9 +40,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void test_funct( float DeltaTime);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly) class UStaticMeshComponent* ItemMesh;
 private:
 	AItem* Objective;
-	UPROPERTY(VisibleAnywhere) class UStaticMeshComponent* ItemMesh;
+	
 
 	float TransformedSin();
 	float RunningTime;
