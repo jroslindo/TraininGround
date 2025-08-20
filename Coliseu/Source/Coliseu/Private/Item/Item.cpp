@@ -105,8 +105,11 @@ void AItem::Tick(float DeltaTime)
 	//	GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Green, message);
 	//}
 	//this->test_funct(DeltaTime);
-	RunningTime += DeltaTime;
-	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	if (hover) {
+		RunningTime += DeltaTime;
+		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	}
+	
 
 }
 

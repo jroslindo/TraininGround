@@ -22,6 +22,7 @@ public:
 	ASlashCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	bool WeaponEquiped = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,12 +38,15 @@ protected:
 	UGroomComponent* Hair;
 	UPROPERTY(EditAnywhere, Category = "Hair")
 	UGroomComponent* Eyebrows;
+	
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 
 private:
+	
+
 	UPROPERTY(VisibleAnywhere) USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere) UCameraComponent* ViewCamera;
 };
