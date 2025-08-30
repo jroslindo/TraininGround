@@ -28,5 +28,6 @@ void USlashAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		this->GroundSpeed = UKismetMathLibrary::VSizeXY(this->SlashCharacterMovement->Velocity);
 		this->IsFalling = this->SlashCharacterMovement->IsFalling();
 		this->WeaponEquiped = this->SlashCharacter->WeaponEquiped;
+		this->CharacterState = this->SlashCharacter->GetCharacterState();
 	}
 }

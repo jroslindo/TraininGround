@@ -12,6 +12,9 @@ class COLISEU_API AWeapon : public AItem
 {
 	GENERATED_BODY()
 
+public:
+	void Equip(USceneComponent* InParent, FName InSocketName);
+
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
@@ -19,5 +22,7 @@ class COLISEU_API AWeapon : public AItem
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	) override;
+
+	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 	
 };

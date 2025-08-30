@@ -13,6 +13,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "Item/Item.h"
+#include "Item/Weapons/Weapon.h"
 
 
 // Sets default values
@@ -112,6 +114,19 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 }
 
+void ASlashCharacter::KeyPressed(const FInputActionValue& Value)
+{
+	const bool KeyPressed = Value.Get<bool>();
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(this->OverlappingItem);
+
+	if (KeyPressed && OverlappingWeapon != nullptr)
+	{
+		OverlappingWeapon->Equip(this->GetMesh(), FName("RightHandSocket"));
+		this->CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	}
+
+}
+
 // Called to bind functionality to input
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -123,6 +138,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnchancedInputComponent->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnchancedInputComponent->BindAction(this->LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 		EnchancedInputComponent->BindAction(this->JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
+		EnchancedInputComponent->BindAction(this->EKeyPressed, ETriggerEvent::Triggered, this, &ASlashCharacter::KeyPressed);
 	}
 
 }

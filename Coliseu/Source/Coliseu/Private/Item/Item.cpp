@@ -29,12 +29,18 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent, AActor* 
 	}
 }
 
+void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
+
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
 	this->ItemMesh->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
+	this->ItemMesh->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
 	/*if (GEngine != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Blue, FString("Hello Unreal 5.7!!!"));
