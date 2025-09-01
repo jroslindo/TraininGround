@@ -15,6 +15,7 @@
 #include "GroomComponent.h"
 #include "Item/Item.h"
 #include "Item/Weapons/Weapon.h"
+#include "Animation/AnimMontage.h"
 
 
 // Sets default values
@@ -127,6 +128,51 @@ void ASlashCharacter::KeyPressed(const FInputActionValue& Value)
 
 }
 
+void ASlashCharacter::Attack(const FInputActionValue& Value)
+{
+	if (this->CharacterState == ECharacterState::ECS_Unequipped)
+		return;
+
+	if (this->ActionState == EActionState::EAS_Unoccupied)
+	{
+		this->PlayAttackMontage();
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+void ASlashCharacter::PlayAttackMontage()
+{
+	UAnimInstance* AnimInstance = this->GetMesh()->GetAnimInstance();
+	
+	if (!AnimInstance)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Red, FString("AnimInstance Null!!!!!"));
+		}
+		return;
+	}
+
+	if (this->AttackMontage)
+	{
+		AnimInstance->Montage_Play(this->AttackMontage);
+		const int32 Selection = FMath::RandRange(0, 1);
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SectionName = FName("Attack1");
+			break;
+		case 1:
+			SectionName = FName("Attack2");
+			break;
+		default:
+			break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName, this->AttackMontage);
+	}
+}
+
 // Called to bind functionality to input
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -139,6 +185,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnchancedInputComponent->BindAction(this->LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 		EnchancedInputComponent->BindAction(this->JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
 		EnchancedInputComponent->BindAction(this->EKeyPressed, ETriggerEvent::Triggered, this, &ASlashCharacter::KeyPressed);
+		EnchancedInputComponent->BindAction(this->AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
 	}
 
 }
