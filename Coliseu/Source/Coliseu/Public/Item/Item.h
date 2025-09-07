@@ -6,6 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+enum class EItemState : uint8
+{
+	EIS_Hovering,
+	EIS_Equip
+};
+
 UCLASS()
 class COLISEU_API AItem : public AActor
 {
@@ -39,7 +45,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	bool hover = true;
+	EItemState ItemState = EItemState::EIS_Hovering;
 
 	UFUNCTION(BlueprintCallable)
 	void test_funct( float DeltaTime);

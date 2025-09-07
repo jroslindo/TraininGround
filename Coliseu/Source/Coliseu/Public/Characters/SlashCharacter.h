@@ -15,6 +15,7 @@ class UCameraComponent;
 class UGroomComponent;
 class AItem;
 class UAnimMontage;
+class AWeapon;
 
 UCLASS()
 class COLISEU_API ASlashCharacter : public ACharacter
@@ -26,7 +27,11 @@ public:
 	FORCEINLINE ECharacterState GetCharacterState() const { return this->CharacterState; }
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	FORCEINLINE bool WeaponEquipped() { return this->EquippedWeapon != nullptr; }
+
+
 	bool WeaponEquiped = false;
+
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
@@ -66,6 +71,15 @@ protected:
 	void Jump(const FInputActionValue& Value);
 	void KeyPressed(const FInputActionValue& Value);
 	void Attack(const FInputActionValue& Value);
+	void PlayEquipMontage(FName SectionName);
+	bool CanDisarm();
+	bool CanArm();
+	
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
+	UFUNCTION(BlueprintCallable)
+	void Arm();
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
@@ -86,6 +100,8 @@ private:
 
 	void PlayAttackMontage();
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = Montages) UAnimMontage* AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = Montages) UAnimMontage* EquipMontage;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon) AWeapon* EquippedWeapon = nullptr;
 };

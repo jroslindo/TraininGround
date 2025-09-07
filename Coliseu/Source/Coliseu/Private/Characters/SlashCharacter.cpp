@@ -30,7 +30,7 @@ ASlashCharacter::ASlashCharacter()
 	//SpringArm
 	this->SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	this->SpringArm->SetupAttachment(this->GetRootComponent());
-	this->SpringArm->TargetArmLength = 200.f;
+	this->SpringArm->TargetArmLength = 250.f;
 	this->SpringArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
 	this->SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 70));
 
@@ -68,6 +68,9 @@ void ASlashCharacter::BeginPlay()
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
 {
+	if (this->ActionState != EActionState::EAS_Unoccupied) return;
+
+
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	const FRotator ControlRotation = this->GetControlRotation();
@@ -117,13 +120,28 @@ void ASlashCharacter::Tick(float DeltaTime)
 
 void ASlashCharacter::KeyPressed(const FInputActionValue& Value)
 {
-	const bool KeyPressed = Value.Get<bool>();
-	AWeapon* OverlappingWeapon = Cast<AWeapon>(this->OverlappingItem);
-
-	if (KeyPressed && OverlappingWeapon != nullptr)
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Equip(this->GetMesh(), FName("RightHandSocket"));
-		this->CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		OverlappingItem = nullptr;
+		EquippedWeapon = OverlappingWeapon;
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			this->ActionState = EActionState::EAS_EquippingWeapon;
+			PlayEquipMontage(FName("Unequip"));
+			CharacterState = ECharacterState::ECS_Unequipped;
+		}
+		else if (CanArm())
+		{
+			this->ActionState = EActionState::EAS_EquippingWeapon;
+			PlayEquipMontage(FName("Equip"));
+			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		}
 	}
 
 }
@@ -136,7 +154,46 @@ void ASlashCharacter::Attack(const FInputActionValue& Value)
 	if (this->ActionState == EActionState::EAS_Unoccupied)
 	{
 		this->PlayAttackMontage();
-		ActionState = EActionState::EAS_Attacking;
+		this->ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+void ASlashCharacter::PlayEquipMontage(FName SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+		AnimInstance->Montage_Play(EquipMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
+bool ASlashCharacter::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ASlashCharacter::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+void ASlashCharacter::Disarm()
+{
+	if (this->EquippedWeapon)
+	{
+		this->EquippedWeapon->AttachMeshToSocket(this->GetMesh(), FName("SpineSocket"));
+	}
+}
+
+void ASlashCharacter::Arm()
+{
+	if (this->EquippedWeapon)
+	{
+		this->EquippedWeapon->AttachMeshToSocket(this->GetMesh(), FName("RightHandSocket"));
 	}
 }
 
@@ -184,7 +241,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnchancedInputComponent->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnchancedInputComponent->BindAction(this->LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 		EnchancedInputComponent->BindAction(this->JumpAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
-		EnchancedInputComponent->BindAction(this->EKeyPressed, ETriggerEvent::Triggered, this, &ASlashCharacter::KeyPressed);
+		EnchancedInputComponent->BindAction(this->EKeyPressed, ETriggerEvent::Started, this, &ASlashCharacter::KeyPressed);
 		EnchancedInputComponent->BindAction(this->AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
 	}
 

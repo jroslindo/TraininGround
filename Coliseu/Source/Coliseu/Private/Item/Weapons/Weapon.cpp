@@ -3,10 +3,24 @@
 
 #include "Item/Weapons/Weapon.h"
 #include "Characters/SlashCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 {
-	this->hover = false;
+	this->ItemState = EItemState::EIS_Equip;
+	AttachMeshToSocket(InParent, InSocketName);
+	if (this->EquipSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			this->EquipSound,
+			GetActorLocation()
+		);
+	}
+}
+
+void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName)
+{
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 	this->ItemMesh->AttachToComponent(InParent, TransformRules, InSocketName);
 }
@@ -15,23 +29,9 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent, AActor
 {
 	Super::OnSphereOverlap(OverlappedComponenent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	ASlashCharacter* SlashCharacter =  Cast<ASlashCharacter>(OtherActor);
-
-	if (SlashCharacter) {
-		SlashCharacter->SetOverlappingItem(this);
-		/*this->hover = false;
-		FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
-		this->ItemMesh->AttachToComponent(SlashCharacter->GetMesh(), TransformRules, FName("RightHandSocket"));
-
-		SlashCharacter->WeaponEquiped = true;*/
-	}
 }
 
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
-
-	if (SlashCharacter) {
-		SlashCharacter->SetOverlappingItem(nullptr);
-	}
+	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }

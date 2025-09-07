@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
+#include "Characters/SlashCharacter.h"
 
 // Sets default values
 AItem::AItem()
@@ -27,11 +28,22 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponenent, AActor* 
 	{
 		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, OtherActorName);
 	}
+
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+
+	if (SlashCharacter && !SlashCharacter->WeaponEquipped()) {
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Orange, FString("Overlapping!"));
+		SlashCharacter->SetOverlappingItem(this);
+	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
 
+	if (SlashCharacter) {
+		SlashCharacter->SetOverlappingItem(nullptr);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -103,19 +115,12 @@ float AItem::TransformedSin()
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
-	//Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);
+	
 
-	//if (GEngine != nullptr)
-	//{
-	//	FString message = FString::Printf(TEXT("Delta: %.3f"), DeltaTime);
-	//	GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Green, message);
-	//}
-	//this->test_funct(DeltaTime);
-	if (hover) {
+	if (this->ItemState == EItemState::EIS_Hovering) {
 		RunningTime += DeltaTime;
 		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
 	}
-	
-
 }
 
